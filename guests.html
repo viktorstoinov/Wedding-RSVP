@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <title>Потвърдили гости</title>
+</head>
+<body>
+  <h1>Потвърдили гости</h1>
+  <h2 id="count">Зареждане...</h2>
+  <ul id="guestList"></ul>
+
+  <script>
+    const list = document.getElementById("guestList");
+    const countDisplay = document.getElementById("count");
+
+    fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec")
+      .then(res => res.json())
+      .then(data => {
+        let count = 0;
+
+        data.forEach(entry => {
+          if (entry.attendance === "Да") {
+            const li = document.createElement("li");
+            li.textContent = entry.name;
+            list.appendChild(li);
+            count++;
+          }
+        });
+
+        countDisplay.textContent = "Общо гости, които ще присъстват: " + count;
+      })
+      .catch(err => {
+        countDisplay.textContent = "Грешка при зареждане.";
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
