@@ -2,16 +2,16 @@
 <html lang="bg">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Потвърждение за Сватба</title>
   <style>
+    
     body {
       font-family: Arial, sans-serif;
       background-color: #f0fff0;
       margin: 0;
       padding: 0;
     }
-
     .container {
       max-width: 400px;
       margin: 2rem auto;
@@ -20,43 +20,38 @@
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
     h1 {
       text-align: center;
       color: #2e7d32;
     }
-
     .guest-row {
       display: flex;
       gap: 5px;
       margin-bottom: 5px;
     }
-
     input[type="text"] {
       flex: 1;
       padding: 10px;
       border-radius: 8px;
       border: 1px solid #ccc;
     }
-
     .remove-btn {
-        background-color: #e57373;
-        border: none;
-        color: white;
-        padding: 0;
-        width: 32px;
-        height: 32px;
-        font-size: 16px;border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      background-color: #e57373;
+      border: none;
+      color: white;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-
     .remove-btn:hover {
       background-color: #d32f2f;
     }
-
     button, .add-btn {
       background-color: #4caf50;
       color: white;
@@ -66,25 +61,20 @@
       cursor: pointer;
       width: 100%;
       margin-top: 10px;
-      
     }
-
     .add-btn {
       width: auto;
       padding: 6px 12px;
       font-size: 0.9rem;
     }
-
     button:hover {
       background-color: #45a049;
     }
-
     label {
       display: block;
       margin-top: 10px;
       color: #2e7d32;
     }
-
     .hidden {
       display: none;
     }
@@ -113,76 +103,85 @@
     <div id="message" class="hidden">Благодарим за отговора!</div>
   </div>
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    if (localStorage.getItem("hasVoted")) {
-      document.body.innerHTML = "<h2 style='text-align:center;'>Вече сте гласували. Благодарим!</h2>";
-      return;
-    }
-
-    const form = document.getElementById("rsvpForm");
-    const guestsDiv = document.getElementById("guests");
-    const addBtn = document.getElementById("addGuest");
-    const message = document.getElementById("message");
-
-    addBtn.addEventListener("click", () => {
-      const guestRow = document.createElement("div");
-      guestRow.className = "guest-row";
-
-      const input = document.createElement("input");
-      input.type = "text";
-      input.name = "guest[]";
-      input.placeholder = "Име на допълнителен гост";
-      input.required = true;
-
-      const removeBtn = document.createElement("button");
-      removeBtn.type = "button";
-      removeBtn.textContent = "✕";
-      removeBtn.className = "remove-btn";
-      removeBtn.addEventListener("click", () => guestRow.remove());
-
-      guestRow.appendChild(input);
-      guestRow.appendChild(removeBtn);
-      guestsDiv.appendChild(guestRow);
-    });
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const formData = new FormData(form);
-      const guests = formData.getAll("guest[]").filter(name => name.trim() !== "");
-      const attendance = formData.get("attendance");
-
-      if (guests.length === 0 || !attendance) {
-        alert("Моля, въведете поне едно име и изберете дали ще присъствате.");
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      if (localStorage.getItem("hasVoted")) {
+        document.body.innerHTML = "<h2 style='text-align:center;'>Вече сте гласували. Благодарим!</h2>";
         return;
       }
 
-      try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbxKKL8s-QQPVKxb0_5xhoB7k2mMg3fTThxQo2Mz8PW3xNo4iK6V_MMoAztdDRRDaP8/exec", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ guests, attendance })
-        });
+      const form = document.getElementById("rsvpForm");
+      const guestsDiv = document.getElementById("guests");
+      const addBtn = document.getElementById("addGuest");
+      const message = document.getElementById("message");
 
-        const result = await response.json();
+      addBtn.addEventListener("click", () => {
+        const guestRow = document.createElement("div");
+        guestRow.className = "guest-row";
 
-        if (result.success) {
-          localStorage.setItem("hasVoted", "true");
-          form.classList.add("hidden");
-          message.classList.remove("hidden");
-          setTimeout(() => window.close(), 3000);
-        } else {
-          alert("Сървърът върна грешка: " + result.error);
+        const input = document.createElement("input");
+        input.type = "text";
+        input.name = "guest[]";
+        input.placeholder = "Име на допълнителен гост";
+        input.required = true;
+
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.textContent = "✕";
+        removeBtn.className = "remove-btn";
+        removeBtn.addEventListener("click", () => guestRow.remove());
+
+        guestRow.appendChild(input);
+        guestRow.appendChild(removeBtn);
+        guestsDiv.appendChild(guestRow);
+      });
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const guests = formData.getAll("guest[]").map(name => name.trim()).filter(name => name !== "");
+        const attendance = formData.get("attendance");
+
+        if (guests.length === 0 || !attendance) {
+          alert("Моля, въведете поне едно име и изберете дали ще присъствате.");
+          return;
         }
-      } catch (error) {
-        alert("Грешка при връзка със сървъра: " + error.message);
-        console.error(error);
-      }
+
+        // Сглобяваме URL с параметрите за GET заявка
+        const baseUrl = "https://script.google.com/macros/s/AKfycbyZekjTlkqiKlXGp-ilhOLxtn_dwMzidhsQJGTy36Dt4D35WcVh6uQ2TXYV4Eczlkc/exec"; // смени ТВОЯ-URL с реалния скрипт ID
+        const params = new URLSearchParams();
+        params.append("guests", guests.join(","));
+        params.append("attendance", attendance);
+        const url = baseUrl + "?" + params.toString();
+
+        try {
+          const response = await fetch(url, {
+            method: "GET",
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            if (result.success) {
+              localStorage.setItem("hasVoted", "true");
+              form.classList.add("hidden");
+              message.classList.remove("hidden");
+              setTimeout(() => window.close(), 3000);
+            } else {
+              alert("Възникна грешка при изпращането: " + result.error);
+            }
+          } else {
+            alert("Възникна грешка при изпращането. Опитайте отново.");
+          }
+        } catch (error) {
+          alert("Грешка при връзка със сървъра.");
+          console.error(error);
+        }
+      });
     });
-  });
+  </script>
+</body>
+</html>
 </script>
 
 </body>
