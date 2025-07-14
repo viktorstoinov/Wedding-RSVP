@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Потвърждение за Сватба</title>
   <style>
-    
-    body {
+    body { 
       font-family: Arial, sans-serif;
       background-color: #f0fff0;
       margin: 0;
@@ -115,6 +114,9 @@
       const addBtn = document.getElementById("addGuest");
       const message = document.getElementById("message");
 
+      // Смени това с твоя реален URL от Apps Script (уеб приложението)
+      const baseUrl = "https://script.google.com/macros/s/AKfycbyZekjTlkqiKlXGp-ilhOLxtn_dwMzidhsQJGTy36Dt4D35WcVh6uQ2TXYV4Eczlkc/exec";
+
       addBtn.addEventListener("click", () => {
         const guestRow = document.createElement("div");
         guestRow.className = "guest-row";
@@ -148,16 +150,11 @@
           return;
         }
 
-        // Сглобяваме URL с параметрите за GET заявка
-        const baseUrl = "https://script.google.com/macros/s/AKfycbzJCEfDGeood4FZewuIZxZoBcOYnPlChw9lQNC4Cn14Yng_FYntLliHqpbpAI5ptyo/exec"; // смени ТВОЯ-URL с реалния скрипт ID
-        const params = new URLSearchParams();
-        params.append("guests", guests.join(","));
-        params.append("attendance", attendance);
-        const url = baseUrl + "?" + params.toString();
-
         try {
-          const response = await fetch(url, {
-            method: "GET",
+          const response = await fetch(baseUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ guests, attendance }),
           });
 
           if (response.ok) {
@@ -182,3 +179,4 @@
   </script>
 </body>
 </html>
+
