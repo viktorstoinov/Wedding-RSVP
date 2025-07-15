@@ -149,6 +149,161 @@
         }
 
         // Сглобяваме URL с параметрите за GET заявка
+        const baseUrl = "https://script.google.com/macros/s/AKfycbyyypL8O9-IwPakP0WHWcWVrZ18wW3wEgfoCSBqEd0cY4tvDCjVwz7qgbMrZ4G5wOE/exec"; // смени ТВОЯ-URL с реалния скрипт ID
+        const params = new URLSearchParams();
+        params.append("guests", guests.join(","));
+        params.append("attendance", attendance);
+        const url = baseUrl + "?" + params.toString();
+
+        try {
+          const response = await fetch(url, {
+            method: "GET",
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            if (result.success) {
+              localStorage.setItem("hasVoted", "true");
+              form.classList.add("hidden");
+              message.classList.remove("hidden");
+              setTimeout(() => window.close(), 3000);
+            } else {
+              alert("Възникна грешка при изпращането: " + result.error);
+            }
+          } else {
+            alert("Възникна грешка при изпращането. Опитайте отново.");
+          }
+        } catch (error) {
+          alert("Грешка при връзка със сървъра.");
+          console.error(error);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+      margin-bottom: 5px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .remove-btn {
+      background-color: #e57373;
+      border: none;
+      color: white;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .remove-btn:hover {
+      background-color: #d32f2f;
+    }
+    button, .add-btn {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+    .add-btn {
+      width: auto;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      color: #2e7d32;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Потвърдете присъствието си</h1>
+    <form id="rsvpForm">
+      <div id="guests">
+        <div class="guest-row">
+          <input type="text" name="guest[]" placeholder="Вашето име" required />
+        </div>
+      </div>
+      <button type="button" id="addGuest" class="add-btn">+ Добави гост</button>
+
+      <label>
+        <input type="radio" name="attendance" value="Да" required /> Ще присъствам
+      </label>
+      <label>
+        <input type="radio" name="attendance" value="Не" required /> Няма да присъствам
+      </label>
+
+      <button type="submit">Изпрати</button>
+    </form>
+    <div id="message" class="hidden">Благодарим за отговора!</div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      if (localStorage.getItem("hasVoted")) {
+        document.body.innerHTML = "<h2 style='text-align:center;'>Вече сте гласували. Благодарим!</h2>";
+        return;
+      }
+
+      const form = document.getElementById("rsvpForm");
+      const guestsDiv = document.getElementById("guests");
+      const addBtn = document.getElementById("addGuest");
+      const message = document.getElementById("message");
+
+      addBtn.addEventListener("click", () => {
+        const guestRow = document.createElement("div");
+        guestRow.className = "guest-row";
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.name = "guest[]";
+        input.placeholder = "Име на допълнителен гост";
+        input.required = true;
+
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.textContent = "✕";
+        removeBtn.className = "remove-btn";
+        removeBtn.addEventListener("click", () => guestRow.remove());
+
+        guestRow.appendChild(input);
+        guestRow.appendChild(removeBtn);
+        guestsDiv.appendChild(guestRow);
+      });
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const guests = formData.getAll("guest[]").map(name => name.trim()).filter(name => name !== "");
+        const attendance = formData.get("attendance");
+
+        if (guests.length === 0 || !attendance) {
+          alert("Моля, въведете поне едно име и изберете дали ще присъствате.");
+          return;
+        }
+
+        // Сглобяваме URL с параметрите за GET заявка
         const baseUrl = "https://script.google.com/macros/s/AKfycbyZekjTlkqiKlXGp-ilhOLxtn_dwMzidhsQJGTy36Dt4D35WcVh6uQ2TXYV4Eczlkc/exec"; // смени ТВОЯ-URL с реалния скрипт ID
         const params = new URLSearchParams();
         params.append("guests", guests.join(","));
